@@ -1,0 +1,136 @@
+{% extends "webapp/BlogHeader.html" %}
+{% block content %}
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="A-Data-Science-Work-Flow">A Data Science Work Flow</h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><b></p>
+<ol>
+<li>Identify a Problem/Objective</li>
+<li>Get data </li>
+<li>Look at the data through exploratory data analysis</li>
+<li>Wrangling and Cleaning</li>
+<li>Create a model</li>
+<li>Analyze Results </li>
+<li>Improve the model by feature engineering and hyper parameter tuning</li>
+<li>Put Model into Production </li>
+</b>
+</ol>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The steps in this list may be completed in different order depending on the problem you are trying to solve.  There are many differing schools of thought on how to go about this process.  This is one that works well for me.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><b>1. Identify a Problem/Objective</b><br>
+    This is the most open ended part of the data science process.  There needs to be a problem identified first.  Examples of this could be: How can we predict if a user on our web page is interested in buying our product so we can spend more advertising money on those users.  How can we predict when a chemical reaction in a reactor is completed and within specifications?  From here we can work on framing the problem in a way that can be represented in a dataset.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><b>2. Get data</b><br>
+Finding a dataset that works for our problem is absolutely critical to the success of the project.  The old rule goes: garbage in= garbage out.  Machine learning and deep learning algorithms only create a regression or classifier model for the training set you give it.  If you give it a garbage data set to train on, you will get garbage results.  There are many data sources on the web, you just need to know where to look.  For the two examples listed above, both would have to come from data collection over a period of time.  The web site would have to log user movement through the site to analyze what users are clicking on and whether they bought a product from the site.  The chemical plant would use the process data they collect for the reactor conditions.<br></p>
+<p>Machine learning and deep learning both work by having what are called features and labels in a dataset.  The labels are usually a single column of data with a categorical or numerical value of the target you are trying to hit. For the web example, the label would be true or false depending on whether the user bought the product.  For the chemical process, the label would be a continuous number which represents the time elapsed until the reactor was pumped out.  The features are all of the data points that represent the conditions you are trying to model.  Examples include: process temperatures, pressures, and levels in the tank for the chemical plant and user mouse movement on each page and where they clicked on each page for the web problem.<br></p>
+<p>Another aspect of the getting data is defining what a good error function is for determining how successful your algorithm is.  Until you get a data set you will not know what the best way to represent error your classifier is.  For some problems accuracy, which is the percent the classifier predicted right, is a good measurement.  For other problems, such as predicting where a taxi will drop off a passenger, other evaluation functions will have to be chosen.  If a taxi gets close to the predicted coordinates but not quite correct, the evaluation method should recognize the classier was close to the predicted coordinates and give the classier credit for being close.  Once the data set has been determined and the evaluation function chosen we can take a look at the dataset.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><b>3. Look at the data through exploratory data analysis</b><br>
+    This is where your data can take you many different ways.  Let’s go with the assumption that you have data in a database.  The best case scenario is that you can get it to fit into a pandas data frame.  With proper data formatting, it is amazing how much data you can get into a data frame and loaded into memory. The key is to make the data types as efficient as possible.  Before you clean your data, you will want to how good your data set is.  If certain features are full of missing values, it may be the best to drop that row of data.  However, it is probably for the best to keep all the data for the initial model creation, even if the missing values are filled in with the column averages.  Some approaches to exploratory data analysis would have the data scientist do an exhaustive analysis on a data set before the model is created.  This includes univariate non-graphical, multivariate non-graphical, univariate graphical, and multivariate graphical analysis.  It is important to understand the data before feeding it through a model, however, an exhaustive analysis could lead to the data scientist making assumptions about the data and creating a model that over-fits.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><b>4. Wrangling and Cleaning</b><br>
+    Most data is incomplete and has some missing values.  The data is also often in the wrong format to be fed into the algorithm which will create a classifier.  Decisions will have to be made on how to treat missing values.  Should you get rid of those rows completely?  Maybe make the empty values the average of the rows and add another Boolean column indicating you added that data as the average.  At this point, just get the data in a form that can be used by your machine learning classier.  You will have a chance to manipulate the data later.  Remember, if the data set is very large, use a subset of the data.  For instance, if the problem is forecasting, it may be beneficial to use the more recent subset of the data as it was more recent.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><b>5. Create a model</b><br>
+    This is the most exciting time! Now that the data is ready to go it’s time to select a model and chose the initial hyper parameter optimization. Model selection is not something we will be covering in this article, but regardless of the model, the hyper parameters will need to be chosen.  Depending on the model several types of models can be chosen.  Pick what you think works for your model and go ahead and run it.  Creating a baseline model will allow for the improvement of the model through feature engineering later.  If the data set is large, train the baseline model on a subset of the data so it can be run quickly.  After the baseline model is created, then feel free to correlate the data and make assumptions about the data to improve the model.  Initially, the model will most likely be under-fit.  But as features are engineered over-fitting will most likely be the issue with the model.<br></p>
+<p>Results not nearly good as you hoped? That’s okay.  You now have a baseline model to work off of.  Go ahead and play with the hyper parameters and try to get the model to run as well as you can.  If the dataset is massive, train the model on a subset of the data so you can see if your hyper parameter tuning as pushing you in the right direction.  This approach of training a model without extensive exploratory data analysis can be debated, however, in my opinion, without a baseline model that is not feature engineered, how will you know all of your feature engineering is creating a better model?  Feature engineering can easily lead to over-fitting since you are drawing assumptions about your dataset by engineering the features in a certain way.  That is why I prefer to create a baseline model with the original data.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><b>6. Analyze Results</b><br> 
+After creating a base model without any feature engineering or hyper parameter tuning, it is more likely that your model is under-fitted as compared to over-fit.  In reality, the model is probably not optimized enough to worry about either under or over-fitting.  If the training set accuracy is higher than the validation and/or testing set accuracy, then the model is over-fit. Vice-versa for under-fitting.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><b>7.  Improve the model by feature engineering and hyper parameter tuning</b><br>
+     This is a good opportunity to do extensive exploratory data analysis.  For binary labels, pivot tables are your friend here to correlate features to your labels for the categorical variables.  Continuous variables are best graphed.  This is a good time to look at your previous assumptions that were made about the missing value handling.  Several models can be run to analyze which configuration of values works the best.  Features that you deem unnecessary can be dropped to make the data frame smaller and reducing the chances of over-fitting.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><b>8. Put Model into Production</b><br> 
+The final piece is to put the model into production.  This part is open ended as there are many directions that one can go with their model.  If the goal was just to analyze a dataset then the final piece would just be charts and trends to present to stakeholders.  If real-time predictions are needed then the model would need to be optimized for handling input data.</p>
+<p>In conclusion, this workflow is a general guide for a data science work flow.  It will most likely be modified because of differences in the problem being solved.</p>
+
+</div>
+</div>
+</div>
+<p>Back to Top:</p><a class="btn btn-success" href="{% url 'DataScienceWorkFlow' %}" role="button">Data Science Workflow</a>
+{% endblock %}

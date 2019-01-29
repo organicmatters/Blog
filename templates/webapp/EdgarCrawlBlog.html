@@ -1,0 +1,30 @@
+{% extends "webapp/BlogHeader.html" %}
+{% block content %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+    </div><div class="inner_cell">
+    <div class="text_cell_render border-box-sizing rendered_html">
+    <h1 id="Making-the-Quarterly-Grade---Do-companies-earnings-predict-future-stock-growth">Making the Quarterly Grade - Do companies earnings predict future stock growth</h1>
+    </div>
+    </div>
+    </div>
+    <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+    </div><div class="inner_cell">
+    <div class="text_cell_render border-box-sizing rendered_html">
+    <p>Have you ever looked at a stock chart for a company over a year and thought to yourself, well if I would have bought here and sold there and then bought back here at this valley later in time and then sold here at this peak I would have done pretty well for myself! I’ve looked at many stock charts and had that “what if I could predict the future” scenario run through my head.</p>
+    <p>Finance may be the most developed field for data science as quantitative traders have been at it for decades.  In python there are many packages for backtesting trading strategies that model many of the nuances of trading stocks.  One of the most difficult tasks in finding a good quantitative trading strategy is finding novel data that gives your strategy an edge on the market.  That means that odds are if you build a model that accurately predicts future stock prices, it will be using custom data that is not widely publically available.  For this project, I wanted to take a stab at gathering novel data and creating a model to evaluate if the data can predict future stock earnings. 
+        The question that I wanted to address was does a company’s quarterly earnings report project to it’s stock value during the next quarter.   I gathered data on all fortune 500 companies stock price for every day between 1997 and 2017.  This data would act as the label in a regression model.  Since I wanted to look at how a companies performance affected its stock price, I needed the quarterly reports for every fortune 500 company.  Luckily for me the SEC requires all publicly traded companies to submit there quarterly reports to the EDGAR database which is publically available.</p>
+    <p>When companies release their quarterly earnings they release them informally.  They normally post their results on their company web page and are required to submit this public announcement to the SEC which gets posted on EDGAR on the day of the announcement.  It would be interesting to look further into how a company's stock price reacts to the earning announcement.  The difficulty in scraping the earnings announcement data is that companies are allowed to release earnings in any format they want so data scraping a 10-K earnings announcement would be very difficult for many companies since they all release earnings in different formats.  Companies are given 45 days after the quarter ends to post their quarterly reports.  These reports are a more in depth look at the companies performance over the last quarter.  There is a large amount of leeway in the verbiage companies use in their quarterly reports.  This added to the difficulty of scraping the data from all Fortune 500 companies. Since the stock price data ended in 2017 I chose to scrape data from all four quarterly reports in 2017.  One of the quarterly reports is bundled in with annual report.  Due to the differences in format for each company’s quarterly report, I had to search for key terms.  The key terms I chose to scrape were net income, revenue, costs, and stock volume.</p>
+    <p>I took this data, cleaned it and created my labels as the percent change in stock price over the next quarter.  I used a linear regression model to fit this data.  The variance in verbiage that companies used in their quarterly report led to many of the values being missing for my data.  This dramatically reduced the size of my model.  The original model had 2000 samples, which consisted of all 4 quarterly reports for all Fortune 500 companies.    My final model had 428 samples.  Going back and making a few changes to the data scraped would have improved the amount of data I had in the final model.  I was able to add in every companies sector and industry to the final model as categorical variables.  There was no correlation between the sector or industry and stock percent change.</p>
+    <p>Learning to live with small R^2 values for capital markets is a reality that I had to face during this project.  Even small R^2 values show better than random predictability.  In trading it’s about having an edge.  Small correlation is still correlation. I also think that it would be beneficial to look at this model in a time series approach.  Most financial model are time series models.</p>
+    <p>Taking a deep dive in financial markets in a two week time period was difficult.  I had to learn about quarterly reports, income statements, and balance sheets along with finding the data needed to make this all work.  Overall this project was a great experience and I will continue to refine the data in hopes of creating a better model.</p>
+    
+    </div>
+    </div>
+    </div>
+    <div class="cell border-box-sizing code_cell rendered">
+    
+    </div>
+     
+<p>Next Blog:</p><a class="btn btn-success" href="{% url 'DataScienceWorkFlow' %}" role="button">Data Science Workflow</a>
+{% endblock %}

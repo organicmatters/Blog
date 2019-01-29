@@ -1,0 +1,2300 @@
+{% extends "webapp/amazonheader.html" %}
+{% block content %}
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="What-is-selling-on-Amazon?">What is selling on Amazon?</h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>I have been interested for awhile now in selling goods through FBA.  The idea is simple: Buy cheap products from Alibaba, have them shipped to an Amazon warehouse, create a listing on Amazon for the product, and profit.  There are many articles and blogs on the internet on how to do this successfully.  There are also data mining software packages that allow you to see what is being sold on Amazon.  I thought is would be interesting to see what has been sold in the electronics department over the last month ending on 7/16/2018.  I gathered this data from Jungle Scout and to my knowledge is data has not been studied before. The objective is two fold:<br><br> 1. Is it worth it to sell electronics on Amazon?<br> 2. Can data science be used to determine what the best product is to be sold on Amazon?</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>One of the main goals of a data scientist is to look at a dataset and determine what value can be extracted from it.  This is done though conducting exploratory data analysis and looking for correlations in the data.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">nltk</span>
+<span class="c1">#from nltk.corpus import stopwords</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">currdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;Jungle Scout CSV Export - Mon Jul 16 2018 18_08_38 GMT-0500 (Central Daylight Time).csv&#39;</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt output_prompt">Out[3]:</div>
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ASIN</th>
+      <th>Product Name</th>
+      <th>Brand</th>
+      <th>Seller</th>
+      <th>Category</th>
+      <th>Price</th>
+      <th>Fees</th>
+      <th>Net</th>
+      <th>Weight (lbs)</th>
+      <th>Product Tier</th>
+      <th>Reviews</th>
+      <th>Avg. Rating</th>
+      <th>Rank</th>
+      <th>Est. Monthly Sales</th>
+      <th>Est. Monthly Revenue</th>
+      <th>LQS</th>
+      <th>Number Sellers</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>B0723599RQ</td>
+      <td>Motorola DOCSIS 3.1 Gig-speed Cable Modem  Mod...</td>
+      <td>Motorola</td>
+      <td>MTRLC LLC</td>
+      <td>Electronics</td>
+      <td>158.00</td>
+      <td>27.9</td>
+      <td>130.1</td>
+      <td>2.0503</td>
+      <td>Standard (Large)</td>
+      <td>573</td>
+      <td>4.1</td>
+      <td>495</td>
+      <td>2539</td>
+      <td>401162.00</td>
+      <td>54</td>
+      <td>22</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>B01MSTB5KW</td>
+      <td>Motorola MG7540 16x4 Cable Modem plus AC1600 D...</td>
+      <td>Motorola</td>
+      <td>MTRLC LLC</td>
+      <td>Electronics</td>
+      <td>129.99</td>
+      <td>23.93</td>
+      <td>106.06</td>
+      <td>2.65</td>
+      <td>Standard (Large)</td>
+      <td>774</td>
+      <td>4.2</td>
+      <td>170</td>
+      <td>3855</td>
+      <td>501111.45</td>
+      <td>52</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>B01LXRSS36</td>
+      <td>Motorola MG7550 16x4 Cable Modem plus AC1900 D...</td>
+      <td>Motorola</td>
+      <td>MTRLC LLC</td>
+      <td>Electronics</td>
+      <td>169.99</td>
+      <td>29.97</td>
+      <td>140.02</td>
+      <td>2.75</td>
+      <td>Standard (Large)</td>
+      <td>1149</td>
+      <td>4.3</td>
+      <td>3187</td>
+      <td>612</td>
+      <td>104033.88</td>
+      <td>53</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>B01JGT2JI6</td>
+      <td>Motorola MG7550 16x4 Cable Modem plus AC1900 D...</td>
+      <td>Motorola</td>
+      <td>Etech Galaxy</td>
+      <td>Electronics</td>
+      <td>163.92</td>
+      <td>29.06</td>
+      <td>134.85999999999999</td>
+      <td>2.75</td>
+      <td>Standard (Large)</td>
+      <td>1150</td>
+      <td>4.3</td>
+      <td>1535</td>
+      <td>1280</td>
+      <td>209817.60</td>
+      <td>63</td>
+      <td>44</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>B07BRZ2KW5</td>
+      <td>Motorola MG7700 24X8 Cable Modem plus AC1900 D...</td>
+      <td>Motorola</td>
+      <td>MTRLC LLC</td>
+      <td>Electronics</td>
+      <td>184.99</td>
+      <td>32.22</td>
+      <td>152.77</td>
+      <td>2.7492</td>
+      <td>Standard (Large)</td>
+      <td>17</td>
+      <td>4.7</td>
+      <td>2836</td>
+      <td>481</td>
+      <td>88980.19</td>
+      <td>53</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We have several csv files that need to be combined into one file so we will do a list comprehension to append the files into a single file:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.csv&quot;</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">skiprows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>  <span class="n">index_col</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt output_prompt">Out[5]:</div>
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Rank</th>
+      <th>Est. Monthly Sales</th>
+      <th>Est. Monthly Revenue</th>
+      <th>LQS</th>
+      <th>Number Sellers</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>3.912200e+04</td>
+      <td>39122.000000</td>
+      <td>3.912200e+04</td>
+      <td>39122.000000</td>
+      <td>39087.000000</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>9.151861e+04</td>
+      <td>219.173420</td>
+      <td>1.389535e+04</td>
+      <td>48.737795</td>
+      <td>8.062860</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>1.636627e+05</td>
+      <td>923.034722</td>
+      <td>8.544046e+04</td>
+      <td>13.742925</td>
+      <td>15.792671</td>
+    </tr>
+    <tr>
+      <th>min</th>
+      <td>1.000000e+00</td>
+      <td>1.000000</td>
+      <td>1.000000e+01</td>
+      <td>0.000000</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>25%</th>
+      <td>7.230750e+03</td>
+      <td>10.000000</td>
+      <td>1.652802e+03</td>
+      <td>38.000000</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>50%</th>
+      <td>2.493200e+04</td>
+      <td>42.000000</td>
+      <td>3.104305e+03</td>
+      <td>49.000000</td>
+      <td>2.000000</td>
+    </tr>
+    <tr>
+      <th>75%</th>
+      <td>8.108150e+04</td>
+      <td>137.000000</td>
+      <td>7.996000e+03</td>
+      <td>60.000000</td>
+      <td>7.000000</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>1.828111e+06</td>
+      <td>90709.920000</td>
+      <td>8.288314e+06</td>
+      <td>87.000000</td>
+      <td>245.000000</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The describe function looks at all continuous columns in the dataframe and gives statistics about the columns. The estimated monthly revenue can gives a positive outlook on the sales for the last month.  The average sales were \$13,895. Not bad for a side gig. However, when looking at the 50th percentile we can see that the average sales are \$3,104 per month which indicates that the top sellers get the vast majority of the sales. The average product has 8 sellers competing to sell the product.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The names for the columns are a bit off so let's correct them:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot; Product Name&quot;</span><span class="p">:</span> <span class="s2">&quot;Product_Name&quot;</span><span class="p">,</span> <span class="s2">&quot; Brand&quot;</span><span class="p">:</span> <span class="s2">&quot;Brand&quot;</span><span class="p">,</span> <span class="s2">&quot; Seller&quot;</span><span class="p">:</span> <span class="s2">&quot;Seller&quot;</span><span class="p">,</span> <span class="s2">&quot; Category&quot;</span><span class="p">:</span> <span class="s2">&quot;Category&quot;</span><span class="p">,</span> <span class="s2">&quot; Price&quot;</span><span class="p">:</span> <span class="s2">&quot;Price&quot;</span><span class="p">,</span> <span class="s2">&quot; Fees&quot;</span><span class="p">:</span> <span class="s2">&quot;Fees&quot;</span><span class="p">,</span> <span class="s2">&quot; Net&quot;</span><span class="p">:</span> <span class="s2">&quot;Net&quot;</span><span class="p">,</span> <span class="s2">&quot; Weight (lbs)&quot;</span><span class="p">:</span> <span class="s2">&quot;Weight_lbs&quot;</span><span class="p">,</span> <span class="s2">&quot; Product Tier&quot;</span><span class="p">:</span> <span class="s2">&quot;Product_Tier&quot;</span><span class="p">,</span> <span class="s2">&quot; Reviews&quot;</span><span class="p">:</span> <span class="s2">&quot;Reviews&quot;</span><span class="p">,</span> <span class="s2">&quot; Avg. Rating&quot;</span><span class="p">:</span> <span class="s2">&quot;Avg_Rating&quot;</span><span class="p">,</span> <span class="s2">&quot; Rank&quot;</span><span class="p">:</span> <span class="s2">&quot;Rank&quot;</span><span class="p">,</span> <span class="s2">&quot; Est. Monthly Sales&quot;</span><span class="p">:</span> <span class="s2">&quot;Est_Monthly_Sales&quot;</span><span class="p">,</span> <span class="s2">&quot; Est. Monthly Revenue&quot;</span><span class="p">:</span> <span class="s2">&quot;Est_Monthly_Revenue&quot;</span><span class="p">,</span> <span class="s2">&quot; LQS&quot;</span><span class="p">:</span> <span class="s2">&quot;LQS&quot;</span><span class="p">,</span> <span class="s2">&quot; Number Sellers&quot;</span><span class="p">:</span> <span class="s2">&quot;Number_Sellers&quot;</span><span class="p">})</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+Index: 39122 entries, 0 to 199
+Data columns (total 17 columns):
+ASIN                   39122 non-null object
+Product_Name           39122 non-null object
+Brand                  39122 non-null object
+Seller                 39122 non-null object
+Category               39122 non-null object
+Price                  39122 non-null object
+Fees                   39122 non-null object
+Net                    39122 non-null object
+Weight_lbs             39122 non-null object
+Product_Tier           39122 non-null object
+Reviews                39122 non-null object
+Avg_Rating             39122 non-null object
+Rank                   39122 non-null int64
+Est_Monthly_Sales      39122 non-null float64
+Est_Monthly_Revenue    39122 non-null float64
+LQS                    39122 non-null int64
+Number_Sellers         39087 non-null float64
+dtypes: float64(3), int64(2), object(12)
+memory usage: 5.4+ MB
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Looking at the info for the data frame we can see that there are several objects that should be numerical values.  This indicates that there are possible NA values that are not represented as nan values that need to be cleaned and corrected.  Price, Fees, Net, Weight, Reviews, and Rating are all objects that should be numerical values.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt output_prompt">Out[8]:</div>
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Index([&#39;ASIN&#39;, &#39;Product_Name&#39;, &#39;Brand&#39;, &#39;Seller&#39;, &#39;Category&#39;, &#39;Price&#39;, &#39;Fees&#39;,
+       &#39;Net&#39;, &#39;Weight_lbs&#39;, &#39;Product_Tier&#39;, &#39;Reviews&#39;, &#39;Avg_Rating&#39;, &#39;Rank&#39;,
+       &#39;Est_Monthly_Sales&#39;, &#39;Est_Monthly_Revenue&#39;, &#39;LQS&#39;, &#39;Number_Sellers&#39;],
+      dtype=&#39;object&#39;)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We should drop category since the category is electronics.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;Category&#39;</span><span class="p">],</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The dataframe currently represents nan's as N.A. We need to change that to nan's.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Price&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Price</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;coerce&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;Price&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Price&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="s1">&#39;raise&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;Fees&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Fees</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;coerce&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;Fees&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Fees&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="s1">&#39;raise&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;Net&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Net</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;coerce&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;Net&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="s1">&#39;raise&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;Weight_lbs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Weight_lbs</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;coerce&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;Weight_lbs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Weight_lbs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="s1">&#39;raise&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;Reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Reviews</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;coerce&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;Reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Reviews&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="s1">&#39;raise&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;Reviews&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Reviews&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="s1">&#39;raise&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;Avg_Rating&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Avg_Rating</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;coerce&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;Avg_Rating&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Avg_Rating&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="s1">&#39;raise&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[78]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+Index: 39122 entries, 0 to 199
+Data columns (total 16 columns):
+ASIN                   39122 non-null object
+Product_Name           39122 non-null object
+Brand                  39122 non-null object
+Seller                 39122 non-null object
+Price                  39116 non-null float64
+Fees                   28077 non-null float64
+Net                    28080 non-null float64
+Weight_lbs             31475 non-null float64
+Product_Tier           39122 non-null object
+Reviews                37215 non-null float64
+Avg_Rating             36592 non-null float64
+Rank                   39122 non-null int64
+Est_Monthly_Sales      39122 non-null float64
+Est_Monthly_Revenue    39122 non-null float64
+LQS                    39122 non-null int64
+Number_Sellers         39087 non-null float64
+dtypes: float64(9), int64(2), object(5)
+memory usage: 6.3+ MB
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[25]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt output_prompt">Out[25]:</div>
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Price</th>
+      <th>Fees</th>
+      <th>Net</th>
+      <th>Weight_lbs</th>
+      <th>Reviews</th>
+      <th>Avg_Rating</th>
+      <th>Rank</th>
+      <th>Est_Monthly_Sales</th>
+      <th>Est_Monthly_Revenue</th>
+      <th>LQS</th>
+      <th>Number_Sellers</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>39116.000000</td>
+      <td>28077.000000</td>
+      <td>28080.000000</td>
+      <td>31475.000000</td>
+      <td>37215.000000</td>
+      <td>36592.000000</td>
+      <td>3.912200e+04</td>
+      <td>39122.000000</td>
+      <td>3.912200e+04</td>
+      <td>39122.000000</td>
+      <td>39087.000000</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>412.743272</td>
+      <td>72.277335</td>
+      <td>334.669700</td>
+      <td>11.680945</td>
+      <td>442.601545</td>
+      <td>95.656061</td>
+      <td>9.151861e+04</td>
+      <td>219.173420</td>
+      <td>1.389535e+04</td>
+      <td>48.737795</td>
+      <td>8.062860</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>2173.996327</td>
+      <td>336.442840</td>
+      <td>1859.984647</td>
+      <td>44.787448</td>
+      <td>3112.666196</td>
+      <td>6177.057637</td>
+      <td>1.636627e+05</td>
+      <td>923.034722</td>
+      <td>8.544046e+04</td>
+      <td>13.742925</td>
+      <td>15.792671</td>
+    </tr>
+    <tr>
+      <th>min</th>
+      <td>1.000000</td>
+      <td>3.360000</td>
+      <td>-4516.890000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>1.000000e+00</td>
+      <td>1.000000</td>
+      <td>1.000000e+01</td>
+      <td>0.000000</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>25%</th>
+      <td>30.480000</td>
+      <td>8.090000</td>
+      <td>22.470000</td>
+      <td>0.500000</td>
+      <td>6.000000</td>
+      <td>3.600000</td>
+      <td>7.230750e+03</td>
+      <td>10.000000</td>
+      <td>1.652802e+03</td>
+      <td>38.000000</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>50%</th>
+      <td>93.240000</td>
+      <td>20.140000</td>
+      <td>73.500000</td>
+      <td>1.950000</td>
+      <td>37.000000</td>
+      <td>4.100000</td>
+      <td>2.493200e+04</td>
+      <td>42.000000</td>
+      <td>3.104305e+03</td>
+      <td>49.000000</td>
+      <td>2.000000</td>
+    </tr>
+    <tr>
+      <th>75%</th>
+      <td>349.990000</td>
+      <td>66.590000</td>
+      <td>297.182500</td>
+      <td>10.250000</td>
+      <td>205.000000</td>
+      <td>4.500000</td>
+      <td>8.108150e+04</td>
+      <td>137.000000</td>
+      <td>7.996000e+03</td>
+      <td>60.000000</td>
+      <td>7.000000</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>246464.820000</td>
+      <td>36972.710000</td>
+      <td>209492.110000</td>
+      <td>4960.400000</td>
+      <td>129960.000000</td>
+      <td>805192.000000</td>
+      <td>1.828111e+06</td>
+      <td>90709.920000</td>
+      <td>8.288314e+06</td>
+      <td>87.000000</td>
+      <td>245.000000</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[26]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt output_prompt">Out[26]:</div>
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ASIN</th>
+      <th>Product_Name</th>
+      <th>Brand</th>
+      <th>Seller</th>
+      <th>Price</th>
+      <th>Fees</th>
+      <th>Net</th>
+      <th>Weight_lbs</th>
+      <th>Product_Tier</th>
+      <th>Reviews</th>
+      <th>Avg_Rating</th>
+      <th>Rank</th>
+      <th>Est_Monthly_Sales</th>
+      <th>Est_Monthly_Revenue</th>
+      <th>LQS</th>
+      <th>Number_Sellers</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>B0723599RQ</td>
+      <td>Motorola DOCSIS 3.1 Gig-speed Cable Modem  Mod...</td>
+      <td>Motorola</td>
+      <td>MTRLC LLC</td>
+      <td>158.00</td>
+      <td>27.90</td>
+      <td>130.10</td>
+      <td>2.0503</td>
+      <td>Standard (Large)</td>
+      <td>573.0</td>
+      <td>4.1</td>
+      <td>495</td>
+      <td>2539.0</td>
+      <td>401162.00</td>
+      <td>54</td>
+      <td>22.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>B01MSTB5KW</td>
+      <td>Motorola MG7540 16x4 Cable Modem plus AC1600 D...</td>
+      <td>Motorola</td>
+      <td>MTRLC LLC</td>
+      <td>129.99</td>
+      <td>23.93</td>
+      <td>106.06</td>
+      <td>2.6500</td>
+      <td>Standard (Large)</td>
+      <td>774.0</td>
+      <td>4.2</td>
+      <td>170</td>
+      <td>3855.0</td>
+      <td>501111.45</td>
+      <td>52</td>
+      <td>9.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>B01LXRSS36</td>
+      <td>Motorola MG7550 16x4 Cable Modem plus AC1900 D...</td>
+      <td>Motorola</td>
+      <td>MTRLC LLC</td>
+      <td>169.99</td>
+      <td>29.97</td>
+      <td>140.02</td>
+      <td>2.7500</td>
+      <td>Standard (Large)</td>
+      <td>1149.0</td>
+      <td>4.3</td>
+      <td>3187</td>
+      <td>612.0</td>
+      <td>104033.88</td>
+      <td>53</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>B01JGT2JI6</td>
+      <td>Motorola MG7550 16x4 Cable Modem plus AC1900 D...</td>
+      <td>Motorola</td>
+      <td>Etech Galaxy</td>
+      <td>163.92</td>
+      <td>29.06</td>
+      <td>134.86</td>
+      <td>2.7500</td>
+      <td>Standard (Large)</td>
+      <td>1150.0</td>
+      <td>4.3</td>
+      <td>1535</td>
+      <td>1280.0</td>
+      <td>209817.60</td>
+      <td>63</td>
+      <td>44.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>B07BRZ2KW5</td>
+      <td>Motorola MG7700 24X8 Cable Modem plus AC1900 D...</td>
+      <td>Motorola</td>
+      <td>MTRLC LLC</td>
+      <td>184.99</td>
+      <td>32.22</td>
+      <td>152.77</td>
+      <td>2.7492</td>
+      <td>Standard (Large)</td>
+      <td>17.0</td>
+      <td>4.7</td>
+      <td>2836</td>
+      <td>481.0</td>
+      <td>88980.19</td>
+      <td>53</td>
+      <td>2.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's now look at the number of N.A's in the object columns:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[27]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ASIN_nan</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">ASIN</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s2">&quot;N.A.&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span><span class="p">])</span>
+<span class="n">Product_Name_nan</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">Product_Name</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s2">&quot;N.A.&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span><span class="p">])</span>
+<span class="n">Seller_nan</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">Seller</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s2">&quot;N.A.&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span><span class="p">])</span>
+<span class="n">Brand_nan</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">Brand</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s2">&quot;N.A.&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span><span class="p">])</span>
+<span class="n">Product_Tier_nan</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">Product_Tier</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="s2">&quot;N.A.&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Nans: ASIN:&quot;</span><span class="p">,</span> <span class="n">ASIN_nan</span><span class="p">,</span> <span class="s2">&quot;Product Name:&quot;</span><span class="p">,</span> <span class="n">Product_Name_nan</span><span class="p">,</span> <span class="s2">&quot;Brand:&quot;</span><span class="p">,</span> <span class="n">Brand_nan</span><span class="p">,</span> <span class="s2">&quot;Product Tier:&quot;</span><span class="p">,</span> <span class="n">Product_Tier_nan</span><span class="p">,</span> <span class="s2">&quot;Seller:&quot;</span><span class="p">,</span> <span class="n">Seller_nan</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Nans: ASIN: 137 Product Name: 348 Brand: 123 Product Tier: 5198 Seller: 1958
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>I do not believe that the ASIN is important because I believe it is an arbitrary number chosen by Amazon. The product name is important since it is the descriptor of what is being sold. The brand is less important and can stay as N.A. and the product tier is either standard or oversized and it is not a critical variable so it can be estimated for the N.A.'s.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>I would like to look at a histogram of the distribution of the sales on Amazon:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[79]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">Est_Monthly_Revenue</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Est_Monthly_Revenue&#39;</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span> <span class="n">bins</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Revenue ($)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Number of Sellers&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Distribution of Monthly Revenue&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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
+QmCC
+"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The histogram above, which at first glance looks incorrect, shows that there are a few products that gross 8 million dollars in monthly revenue which make the histogram very unbalanced.  Let's shrink the histogram axis so we can see the majority of sellers.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[80]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">50000</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Est_Monthly_Revenue&#39;</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span> <span class="n">bins</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Revenue ($)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Number of Sellers&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Distribution of Monthly Revenue&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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
+WA31CcDLgSuSXN7a3gwckGQxUMAK4NUAVXVVkjOBq+mtpHpYWwkV4LXAycDm9FZBdSVUSZIkSZoC
+0x4Wq+obwFi/h3juBH2OAo4ao30ZsNvUVSdJkiRJgiGvhipJkiRJmpkMi5IkSZKkDsOiJEmSJKnD
+sChJkiRJ6jAsSpIkSZI6DIuSJEmSpI5h/M6iNOcsPOLzwy5hQiuO3nfYJUiSJGmGcWZRkiRJktRh
+WJQkSZIkdRgWJUmSJEkdhkVJkiRJUodhUZIkSZLUYViUJEmSJHUYFiVJkiRJHf7OoiR/B1KSJEkd
+zixKkiRJkjoMi5IkSZKkDm9DlTTjeZusJEnS9HNmUZIkSZLUYViUJEmSJHUYFiVJkiRJHT6zKEkb
+yGcqJUnSbGRYlKRZbqaHWTDQSpI0E3kbqiRJkiSpw5lFSdLQzfTZT2c+JUlzkTOLkiRJkqQOZxYl
+SVoPZz4lSXPRRh8Wk+wD/G9gE+DDVXX0kEuSJGlaGWYlSYOwUYfFJJsAHwSeBqwEvpXknKq6eriV
+SZKkETM9zGp28x8rpHtvow6LwB7A8qq6FiDJGcB+gGFRkiRJ/mOFhmpj/8eKjX2BmwXADX3vV7Y2
+SZIkSdIG2NhnFiclyaHAoe3tz5NcM6BTbQf8dEBjS/281jRdvNY0XbzWNJ283jQt8u4Ze609fDIH
+bexhcRWwU9/7HVvbOqrqBOCEQReTZFlVLRn0eSSvNU0XrzVNF681TSevN02Xjf1a29hvQ/0WsCjJ
+zknuCywFzhlyTZIkSZK00duoZxaram2SvwG+SO+nM06qqquGXJYkSZIkbfQ26rAIUFXnAucOu45m
+4Le6So3XmqaL15qmi9eappPXm6bLRn2tpaqGXYMkSZIkaYbZ2J9ZlCRJkiQNgGFxCiTZJ8k1SZYn
+OWLY9WjjkOSkJDcnubKvbZsk5yf5Qfu7dd++I9s1dk2SZ/S1757kirbv2CRp7Zsl+XhrvzjJwun8
+fJo5kuyU5CtJrk5yVZLXt3avN02pJPdLckmS77Rr7Z9au9eaBiLJJkm+neRz7b3XmgYiyYp2nVye
+ZFlrm/XXm2FxAyXZBPgg8ExgV+CAJLsOtyptJE4G9hnVdgRwQVUtAi5o72nX1FLg0a3Pce3aAzge
+OARY1F4jYx4M3FZVuwDHAO8e2CfRTLcWOLyqdgX2BA5r15TXm6bancBTq+oxwGJgnyR74rWmwXk9
+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
+"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Even after cutting down the x axis we can still see that selling electronics on Amazon favors heavily the top 1%.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[100]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">describe</span><span class="p">(</span><span class="n">percentiles</span><span class="o">=</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span><span class="o">/</span><span class="mi">100</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt output_prompt">Out[100]:</div>
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Price</th>
+      <th>Fees</th>
+      <th>Net</th>
+      <th>Weight_lbs</th>
+      <th>Reviews</th>
+      <th>Avg_Rating</th>
+      <th>Rank</th>
+      <th>Est_Monthly_Sales</th>
+      <th>Est_Monthly_Revenue</th>
+      <th>LQS</th>
+      <th>Number_Sellers</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>count</th>
+      <td>39116.000000</td>
+      <td>28077.000000</td>
+      <td>28080.000000</td>
+      <td>31475.000000</td>
+      <td>37215.000000</td>
+      <td>36592.000000</td>
+      <td>3.912200e+04</td>
+      <td>39122.000000</td>
+      <td>3.912200e+04</td>
+      <td>39122.000000</td>
+      <td>39087.000000</td>
+    </tr>
+    <tr>
+      <th>mean</th>
+      <td>412.743272</td>
+      <td>72.277335</td>
+      <td>334.669700</td>
+      <td>11.680945</td>
+      <td>442.601545</td>
+      <td>95.656061</td>
+      <td>9.151861e+04</td>
+      <td>219.173420</td>
+      <td>1.389535e+04</td>
+      <td>48.737795</td>
+      <td>8.062860</td>
+    </tr>
+    <tr>
+      <th>std</th>
+      <td>2173.996327</td>
+      <td>336.442840</td>
+      <td>1859.984647</td>
+      <td>44.787448</td>
+      <td>3112.666196</td>
+      <td>6177.057637</td>
+      <td>1.636627e+05</td>
+      <td>923.034722</td>
+      <td>8.544046e+04</td>
+      <td>13.742925</td>
+      <td>15.792671</td>
+    </tr>
+    <tr>
+      <th>min</th>
+      <td>1.000000</td>
+      <td>3.360000</td>
+      <td>-4516.890000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>1.000000e+00</td>
+      <td>1.000000</td>
+      <td>1.000000e+01</td>
+      <td>0.000000</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>1%</th>
+      <td>6.690000</td>
+      <td>3.707600</td>
+      <td>2.950000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>1.000000</td>
+      <td>1.050000e+02</td>
+      <td>1.000000</td>
+      <td>1.020768e+03</td>
+      <td>17.000000</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>5.1%</th>
+      <td>11.753458</td>
+      <td>4.520000</td>
+      <td>6.860000</td>
+      <td>0.020000</td>
+      <td>1.000000</td>
+      <td>2.800000</td>
+      <td>7.706508e+02</td>
+      <td>1.000000</td>
+      <td>1.100000e+03</td>
+      <td>27.000000</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>9.2%</th>
+      <td>14.990000</td>
+      <td>5.240000</td>
+      <td>9.750000</td>
+      <td>0.100000</td>
+      <td>1.000000</td>
+      <td>3.100000</td>
+      <td>1.735000e+03</td>
+      <td>2.000000</td>
+      <td>1.198000e+03</td>
+      <td>30.000000</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>13.2%</th>
+      <td>18.990000</td>
+      <td>5.840000</td>
+      <td>12.300000</td>
+      <td>0.200000</td>
+      <td>2.000000</td>
+      <td>3.300000</td>
+      <td>2.864000e+03</td>
+      <td>3.000000</td>
+      <td>1.295341e+03</td>
+      <td>33.000000</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>17.3%</th>
+      <td>22.990000</td>
+      <td>6.590000</td>
+      <td>15.360000</td>
+      <td>0.280000</td>
+      <td>3.000000</td>
+      <td>3.400000</td>
+      <td>4.230000e+03</td>
+      <td>5.000000</td>
+      <td>1.402349e+03</td>
+      <td>35.000000</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>21.4%</th>
+      <td>26.990000</td>
+      <td>7.340000</td>
+      <td>18.760000</td>
+      <td>0.400000</td>
+      <td>4.000000</td>
+      <td>3.500000</td>
+      <td>5.736414e+03</td>
+      <td>8.000000</td>
+      <td>1.529550e+03</td>
+      <td>36.000000</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>25.5%</th>
+      <td>31.970000</td>
+      <td>8.230000</td>
+      <td>22.500000</td>
+      <td>0.500000</td>
+      <td>6.000000</td>
+      <td>3.600000</td>
+      <td>7.438000e+03</td>
+      <td>11.000000</td>
+      <td>1.679520e+03</td>
+      <td>38.000000</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>29.6%</th>
+      <td>36.990000</td>
+      <td>9.270000</td>
+      <td>26.750000</td>
+      <td>0.630000</td>
+      <td>9.000000</td>
+      <td>3.700000</td>
+      <td>9.476296e+03</td>
+      <td>15.000000</td>
+      <td>1.838894e+03</td>
+      <td>40.000000</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>33.7%</th>
+      <td>44.720000</td>
+      <td>10.490000</td>
+      <td>32.222633</td>
+      <td>0.780099</td>
+      <td>12.000000</td>
+      <td>3.800000</td>
+      <td>1.158474e+04</td>
+      <td>19.000000</td>
+      <td>2.017345e+03</td>
+      <td>42.000000</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>37.8%</th>
+      <td>54.799500</td>
+      <td>12.286900</td>
+      <td>39.500000</td>
+      <td>0.990000</td>
+      <td>16.000000</td>
+      <td>3.900000</td>
+      <td>1.396918e+04</td>
+      <td>24.000000</td>
+      <td>2.238481e+03</td>
+      <td>44.000000</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>41.8%</th>
+      <td>64.980000</td>
+      <td>14.520000</td>
+      <td>48.387633</td>
+      <td>1.150000</td>
+      <td>21.000000</td>
+      <td>3.900000</td>
+      <td>1.680300e+04</td>
+      <td>30.000000</td>
+      <td>2.479829e+03</td>
+      <td>45.000000</td>
+      <td>1.000000</td>
+    </tr>
+    <tr>
+      <th>45.9%</th>
+      <td>79.880000</td>
+      <td>17.005633</td>
+      <td>61.079408</td>
+      <td>1.460000</td>
+      <td>28.000000</td>
+      <td>4.000000</td>
+      <td>2.047024e+04</td>
+      <td>35.000000</td>
+      <td>2.759400e+03</td>
+      <td>47.000000</td>
+      <td>2.000000</td>
+    </tr>
+    <tr>
+      <th>50%</th>
+      <td>93.240000</td>
+      <td>20.140000</td>
+      <td>73.500000</td>
+      <td>1.950000</td>
+      <td>37.000000</td>
+      <td>4.100000</td>
+      <td>2.493200e+04</td>
+      <td>42.000000</td>
+      <td>3.104305e+03</td>
+      <td>49.000000</td>
+      <td>2.000000</td>
+    </tr>
+    <tr>
+      <th>54.1%</th>
+      <td>113.990000</td>
+      <td>24.208733</td>
+      <td>92.330592</td>
+      <td>2.550000</td>
+      <td>48.000000</td>
+      <td>4.100000</td>
+      <td>3.052688e+04</td>
+      <td>51.000000</td>
+      <td>3.509723e+03</td>
+      <td>50.000000</td>
+      <td>2.000000</td>
+    </tr>
+    <tr>
+      <th>58.2%</th>
+      <td>139.990000</td>
+      <td>29.230000</td>
+      <td>116.000000</td>
+      <td>3.400000</td>
+      <td>63.000000</td>
+      <td>4.200000</td>
+      <td>3.656876e+04</td>
+      <td>60.000000</td>
+      <td>3.999000e+03</td>
+      <td>52.000000</td>
+      <td>3.000000</td>
+    </tr>
+    <tr>
+      <th>62.2%</th>
+      <td>169.990000</td>
+      <td>34.579300</td>
+      <td>144.430000</td>
+      <td>4.600000</td>
+      <td>81.000000</td>
+      <td>4.300000</td>
+      <td>4.373382e+04</td>
+      <td>75.000000</td>
+      <td>4.598132e+03</td>
+      <td>54.000000</td>
+      <td>3.000000</td>
+    </tr>
+    <tr>
+      <th>66.3%</th>
+      <td>209.000000</td>
+      <td>42.187467</td>
+      <td>177.448400</td>
+      <td>6.000000</td>
+      <td>107.000000</td>
+      <td>4.300000</td>
+      <td>5.204563e+04</td>
+      <td>90.000000</td>
+      <td>5.399903e+03</td>
+      <td>56.000000</td>
+      <td>4.000000</td>
+    </tr>
+    <tr>
+      <th>70.4%</th>
+      <td>269.954792</td>
+      <td>51.721833</td>
+      <td>228.838875</td>
+      <td>7.750000</td>
+      <td>147.000000</td>
+      <td>4.400000</td>
+      <td>6.295982e+04</td>
+      <td>109.000000</td>
+      <td>6.418930e+03</td>
+      <td>58.000000</td>
+      <td>5.000000</td>
+    </tr>
+    <tr>
+      <th>74.5%</th>
+      <td>349.000000</td>
+      <td>64.772400</td>
+      <td>289.258550</td>
+      <td>10.000000</td>
+      <td>199.000000</td>
+      <td>4.500000</td>
+      <td>7.869480e+04</td>
+      <td>133.145000</td>
+      <td>7.787769e+03</td>
+      <td>60.000000</td>
+      <td>7.000000</td>
+    </tr>
+    <tr>
+      <th>78.6%</th>
+      <td>449.990000</td>
+      <td>82.441700</td>
+      <td>375.098283</td>
+      <td>13.359550</td>
+      <td>271.000000</td>
+      <td>4.600000</td>
+      <td>1.030483e+05</td>
+      <td>170.000000</td>
+      <td>9.667457e+03</td>
+      <td>62.000000</td>
+      <td>9.000000</td>
+    </tr>
+    <tr>
+      <th>82.7%</th>
+      <td>599.000000</td>
+      <td>105.664800</td>
+      <td>492.959467</td>
+      <td>17.750000</td>
+      <td>377.000000</td>
+      <td>4.700000</td>
+      <td>1.421441e+05</td>
+      <td>223.000000</td>
+      <td>1.272912e+04</td>
+      <td>64.000000</td>
+      <td>12.000000</td>
+    </tr>
+    <tr>
+      <th>86.8%</th>
+      <td>839.990000</td>
+      <td>141.187900</td>
+      <td>670.370000</td>
+      <td>24.000000</td>
+      <td>576.000000</td>
+      <td>4.900000</td>
+      <td>2.237988e+05</td>
+      <td>308.000000</td>
+      <td>1.690182e+04</td>
+      <td>66.000000</td>
+      <td>17.000000</td>
+    </tr>
+    <tr>
+      <th>90.8%</th>
+      <td>1200.000000</td>
+      <td>201.493667</td>
+      <td>986.624000</td>
+      <td>34.000000</td>
+      <td>872.000000</td>
+      <td>5.000000</td>
+      <td>3.136701e+05</td>
+      <td>470.000000</td>
+      <td>2.426794e+04</td>
+      <td>67.000000</td>
+      <td>24.000000</td>
+    </tr>
+    <tr>
+      <th>94.9%</th>
+      <td>1784.449750</td>
+      <td>286.928200</td>
+      <td>1392.942283</td>
+      <td>51.303583</td>
+      <td>1552.288333</td>
+      <td>5.000000</td>
+      <td>4.726150e+05</td>
+      <td>839.000000</td>
+      <td>4.435974e+04</td>
+      <td>70.000000</td>
+      <td>40.000000</td>
+    </tr>
+    <tr>
+      <th>99%</th>
+      <td>3797.990000</td>
+      <td>622.082000</td>
+      <td>2946.613500</td>
+      <td>123.000000</td>
+      <td>5229.000000</td>
+      <td>5.000000</td>
+      <td>7.679839e+05</td>
+      <td>3017.900000</td>
+      <td>1.802676e+05</td>
+      <td>74.000000</td>
+      <td>77.000000</td>
+    </tr>
+    <tr>
+      <th>max</th>
+      <td>246464.820000</td>
+      <td>36972.710000</td>
+      <td>209492.110000</td>
+      <td>4960.400000</td>
+      <td>129960.000000</td>
+      <td>805192.000000</td>
+      <td>1.828111e+06</td>
+      <td>90709.920000</td>
+      <td>8.288314e+06</td>
+      <td>87.000000</td>
+      <td>245.000000</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's look at the top 10 selling products:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[106]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Est_Monthly_Revenue&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt output_prompt">Out[106]:</div>
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ASIN</th>
+      <th>Product_Name</th>
+      <th>Brand</th>
+      <th>Seller</th>
+      <th>Price</th>
+      <th>Fees</th>
+      <th>Net</th>
+      <th>Weight_lbs</th>
+      <th>Product_Tier</th>
+      <th>Reviews</th>
+      <th>Avg_Rating</th>
+      <th>Rank</th>
+      <th>Est_Monthly_Sales</th>
+      <th>Est_Monthly_Revenue</th>
+      <th>LQS</th>
+      <th>Number_Sellers</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>89</th>
+      <td>B01D1W119M</td>
+      <td>Garmin Fenix 3 Sapphire Performance Bundle</td>
+      <td>Garmin</td>
+      <td>Amazon.com</td>
+      <td>517.06</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>true</td>
+      <td>400.0</td>
+      <td>4.2</td>
+      <td>139</td>
+      <td>5190.0</td>
+      <td>2683541.40</td>
+      <td>48</td>
+      <td>6.0</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>B01MYGISTO</td>
+      <td>TCL 49S405 49-Inch 4K Ultra HD Roku Smart LED ...</td>
+      <td>TCL</td>
+      <td>Amazon.com</td>
+      <td>319.99</td>
+      <td>67.50</td>
+      <td>252.49</td>
+      <td>34.45</td>
+      <td>Oversize (Small)</td>
+      <td>2900.0</td>
+      <td>4.3</td>
+      <td>93</td>
+      <td>9264.0</td>
+      <td>2964387.36</td>
+      <td>56</td>
+      <td>8.0</td>
+    </tr>
+    <tr>
+      <th>93</th>
+      <td>B0161RJ81C</td>
+      <td>Garmin Fenix 3  Sapphire  White Rose/Gold</td>
+      <td>Garmin</td>
+      <td>Amazon.com</td>
+      <td>599.99</td>
+      <td>92.99</td>
+      <td>507.00</td>
+      <td>0.75</td>
+      <td>Standard (Large)</td>
+      <td>400.0</td>
+      <td>4.2</td>
+      <td>122</td>
+      <td>5221.0</td>
+      <td>3132547.79</td>
+      <td>33</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>87</th>
+      <td>B01A5HILB2</td>
+      <td>Garmin Fenix 3 HR  Gray Performer Bundle</td>
+      <td>Garmin</td>
+      <td>SmartTechs</td>
+      <td>414.89</td>
+      <td>65.22</td>
+      <td>349.67</td>
+      <td>0.93</td>
+      <td>Standard (Large)</td>
+      <td>1098.0</td>
+      <td>4.4</td>
+      <td>68</td>
+      <td>8010.0</td>
+      <td>3323268.90</td>
+      <td>65</td>
+      <td>5.0</td>
+    </tr>
+    <tr>
+      <th>88</th>
+      <td>B00S7LZWHU</td>
+      <td>Garmin Fenix 3 Sapphire Performance Bundle</td>
+      <td>Garmin</td>
+      <td>Amazon.com</td>
+      <td>517.06</td>
+      <td>81.74</td>
+      <td>435.32</td>
+      <td>1.30</td>
+      <td>Standard (Large)</td>
+      <td>400.0</td>
+      <td>4.2</td>
+      <td>92</td>
+      <td>6720.0</td>
+      <td>3474643.20</td>
+      <td>38</td>
+      <td>6.0</td>
+    </tr>
+    <tr>
+      <th>84</th>
+      <td>B00RY1YWSO</td>
+      <td>Garmin fenix 3 GPS Watch  Gray</td>
+      <td>Garmin</td>
+      <td>Amazon.com</td>
+      <td>499.99</td>
+      <td>77.99</td>
+      <td>422.00</td>
+      <td>0.65</td>
+      <td>Standard (Large)</td>
+      <td>1098.0</td>
+      <td>4.4</td>
+      <td>85</td>
+      <td>7050.0</td>
+      <td>3524929.50</td>
+      <td>36</td>
+      <td>21.0</td>
+    </tr>
+    <tr>
+      <th>90</th>
+      <td>B014SS9Q90</td>
+      <td>Garmin Fenix 3 Sapphire Performance Bundle</td>
+      <td>Garmin</td>
+      <td>Amazon.com</td>
+      <td>577.23</td>
+      <td>90.76</td>
+      <td>486.47</td>
+      <td>1.30</td>
+      <td>Standard (Large)</td>
+      <td>400.0</td>
+      <td>4.2</td>
+      <td>92</td>
+      <td>6129.0</td>
+      <td>3537842.67</td>
+      <td>59</td>
+      <td>6.0</td>
+    </tr>
+    <tr>
+      <th>94</th>
+      <td>B01MXZPG0U</td>
+      <td>Garmin Fenix 3  Sapphire  White Rose/Gold</td>
+      <td>Garmin</td>
+      <td>Amazon.com</td>
+      <td>599.99</td>
+      <td>92.99</td>
+      <td>507.00</td>
+      <td>0.80</td>
+      <td>Standard (Large)</td>
+      <td>400.0</td>
+      <td>4.2</td>
+      <td>90</td>
+      <td>6810.0</td>
+      <td>4085931.90</td>
+      <td>33</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>B01MTGM5I9</td>
+      <td>TCL 55S405 55-Inch 4K Ultra HD Roku Smart LED ...</td>
+      <td>TCL</td>
+      <td>Amazon.com</td>
+      <td>379.99</td>
+      <td>90.47</td>
+      <td>289.52</td>
+      <td>38.01</td>
+      <td>Oversize (Large)</td>
+      <td>2900.0</td>
+      <td>4.3</td>
+      <td>57</td>
+      <td>13004.0</td>
+      <td>4941389.96</td>
+      <td>56</td>
+      <td>12.0</td>
+    </tr>
+    <tr>
+      <th>59</th>
+      <td>B06XNLC63G</td>
+      <td>FORTINET | FC-10-03702-871-02-36 | FortiGate-3...</td>
+      <td>Fortinet</td>
+      <td>SerenIT</td>
+      <td>202154.00</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>N.A.</td>
+      <td>5.0</td>
+      <td>4.1</td>
+      <td>29957</td>
+      <td>41.0</td>
+      <td>8288314.00</td>
+      <td>64</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>And the highest grossing product is Fortinet, a web app firewall.  Next, is a smart TV and then a watch made by Garmin.</p>
+
+</div>
+</div>
+</div>
+ 
+
+
+{% endblock %}
+

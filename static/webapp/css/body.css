@@ -1,0 +1,56 @@
+.navbar {
+	border-radius: 10px;
+}
+
+h1 {
+	font-family: 'Saira', sans-serif;
+	text-align: center;
+	padding-top: 40px;
+	padding-bottom: 20px;
+}
+
+.input {
+	border-radius: 10px;
+	background-color: rgba(0,0,250,.05);
+}
+
+.output_wrapper {
+	border-radius: 10px;
+}
+
+#menu {
+	padding-top: 100px;	
+}
+
+footer{
+	margin-top: 150px;
+	height: 200px;
+	background: rgba(0,255,0,.2);
+	border-radius: 10px;
+	font-family: 'Kaushan Script', cursive;
+        font-size: 48px;
+        	
+}
+
+.card{
+	margin-top: 15px;
+	margin-bottom: 15px;
+	font-family: 'Saira Condensed', sans-serif;
+}
+
+#title{
+	font-family: 'Saira', sans-serif;
+}
+
+iframe {
+
+	style="float:center"
+}
+
+#About {
+	padding-bottom:250px;
+}
+
+.card-title {
+	font-size=36px;
+}

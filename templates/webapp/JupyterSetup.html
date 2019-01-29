@@ -1,0 +1,68 @@
+{% extends "webapp/cnnheader.html" %}
+{% block content %}
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Setting-up-the-Jupyter-Notebook-and-Conda-Environment">Setting up the Jupyter Notebook and Conda Environment</h1>
+</div>
+</div>
+</div>
+<body>
+<!--<div class="embed-responsive embed-responsive-16by9">
+<iframe width="853" height="480" src="https://www.youtube.com/embed/fIxJxH_bmkI" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen>
+</iframe>
+</div> -->
+</body>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<br>
+<h2 id="Creating-a-Conda-Environment">Creating a Conda Environment</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Whether you are running on the AWS, Azure, or Google GPU cloud compute or just running locally, this tutorial will run the same across all platforms.  This is due to the beauty of the conda environments running on Python Anaconda.  Anaconda will detect what platform you are running on and download the correct binaries for any Python package for that platform. If you are running the AWS Deep Learning AMI then anaconda and jupyter notebook are already installed so you can skip to activating your conda environment and starting up your Jupyter notebook.  If you do not have these packages installed perform the following.  Download anaconda by first going to <a href="https://www.anaconda.com/download/#linux">https://www.anaconda.com/download/#linux</a>.</p>
+<p>Right click the Download button for the version of python you are using and select "Copy link address".  Then you can use wget in your terminal to download the link using wget.  This will look like:</p>
+<p><b>wget https://repo.continuum.io/archive/Anaconda3-5.1.0-Linux-x86_64.sh</b></p>
+<p>Next, run the downloaded script:</p>
+<p><b>bash Anaconda-latest-Linux-x86_64.sh</b></p>
+<p>When install go ahead and check its installation:</p>
+<p><b>conda info</b></p>
+<p>You should expect to see information pertaining to version, root directory, etc.  Now we can set up an environment to work in.</p>
+<p><b>conda create --name deeplearning python=3.6 keras numpy jupyter tensorflow-gpu </b></p>
+<p>Now activate the environment:</p>
+<p>On Linux/Mac: <b>source activate deeplearning</b> <br>
+On Windows: <b>activate deeplearning</b></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Starting-the-Jupyter-Notebook">Starting the Jupyter Notebook</h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now we can start jupyter notebook. This will be different depending whether you are running on the cloud or locally.</p>
+<p>If you are running locally this is straight forward. Type jupyter notebook into terminal:</p>
+<p><b>jupyter notebook</b></p>
+
+</div>
+</div>
+</div>
+<br>
+<p>Next:</p><a class="btn btn-success" href="{% url 'TransferLearning' %}" role="button">Transfer Learning</a>
+{% endblock %}
+

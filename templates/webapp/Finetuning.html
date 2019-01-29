@@ -1,0 +1,291 @@
+{% extends "webapp/cnnheader.html" %}
+{% block content %}
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Finetuning-a-Pretrained-Model">Finetuning a Pretrained Model</h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Here we are going to look at image classification.  We are going to train an image classifier to look at several different labeled classes of photos and determine which class to label a photo.  We will be using a very popular dataset called Cifar10. The classes represented in Cifar10 are: plane, car, bird, cat, deer, dog, frog, horse, ship, and truck.  The work flow here is as follows: <br>
+<br>1. Import and prepare the images<br> 2. Set up a pretrained neural network<br> 3. Finetune the neural network to work with the input data<br> 4. Compile, fit, and evaluate model<br>
+Before we used ResNet50 as our image classifier.  Here we will use Vgg16 instead.  ResNet50 is a more recent image classifier, however, Vgg16 is a good first model to learn due to it's simplicity.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>First, we will want to make our imports. We want to import the cifar10 dataset along with the VGG16 architecture.  We will be working with the functional Keras API and be using Adam as our optimizer.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">keras.datasets</span> <span class="k">import</span> <span class="n">cifar10</span>
+<span class="kn">from</span> <span class="nn">keras.preprocessing.image</span> <span class="k">import</span> <span class="n">ImageDataGenerator</span>
+<span class="kn">from</span> <span class="nn">keras.applications.vgg16</span> <span class="k">import</span> <span class="n">VGG16</span>
+<span class="kn">from</span> <span class="nn">keras.preprocessing</span> <span class="k">import</span> <span class="n">image</span>
+<span class="kn">from</span> <span class="nn">keras.applications.vgg16</span> <span class="k">import</span> <span class="n">preprocess_input</span>
+<span class="kn">from</span> <span class="nn">keras.layers</span> <span class="k">import</span> <span class="n">Input</span><span class="p">,</span> <span class="n">Flatten</span><span class="p">,</span> <span class="n">Dense</span>
+<span class="kn">from</span> <span class="nn">keras.models</span> <span class="k">import</span> <span class="n">Model</span>
+<span class="kn">from</span> <span class="nn">keras.optimizers</span> <span class="k">import</span> <span class="n">Adam</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">keras</span> <span class="k">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">keras.utils</span> <span class="k">import</span> <span class="n">np_utils</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We need to specify how many classes we need to we will do that.  We are also able to break the cifar10 dataset into our training and test sets.  It is important in machine learning to break your datasets into training and testing sets.  Later, we will learn that it is important to have a validation set as well, but more on that later. The training and test sets will need to be turned into categorical variables and keras has a nice function called to_categorical that does that for you. An image data generator will then be created which will turn the images into data that is formatted for the Tensorflow backend to read in.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Next, the VGG model will be created with the imagenet weights preloaded.  The weights that were created by the imagenet winners were run on the entire imagenet dataset so they are a much better starting point than random for creating an image classifier.  The include top = False portion means that the last portion of the VGG16 classifier which are three dense layers (also known as linear layers), are left out. We are doing this because in the next line we will set the layers = trainable to false, which will freeze the current model which mostly consists of convolutional layers currently.  Keras requires that the input shape is always explicitly stated so the input shape is stated.  Each picture is 32x32 pixels and there are 3 color channels- red, green and blue.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">num_classes</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">),</span> <span class="p">(</span><span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span> <span class="o">=</span> <span class="n">cifar10</span><span class="o">.</span><span class="n">load_data</span><span class="p">()</span>
+<span class="n">y_train</span> <span class="o">=</span> <span class="n">np_utils</span><span class="o">.</span><span class="n">to_categorical</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
+<span class="n">y_test</span> <span class="o">=</span> <span class="n">np_utils</span><span class="o">.</span><span class="n">to_categorical</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
+
+<span class="n">datagen</span> <span class="o">=</span> <span class="n">ImageDataGenerator</span><span class="p">()</span>
+
+<span class="c1">#Get back the convolutional part of a VGG network trained on ImageNet</span>
+<span class="n">model_vgg16_conv</span> <span class="o">=</span> <span class="n">VGG16</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s1">&#39;imagenet&#39;</span><span class="p">,</span> <span class="n">include_top</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">model_vgg16_conv</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span> <span class="n">layer</span><span class="o">.</span><span class="n">trainable</span><span class="o">=</span><span class="kc">False</span>
+
+<span class="c1">#Create your own input format (here 3x200x200)</span>
+<span class="nb">input</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;image_input&#39;</span><span class="p">)</span>
+
+<span class="c1">#Use the generated model </span>
+<span class="n">output_vgg16_conv</span> <span class="o">=</span> <span class="n">model_vgg16_conv</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now we are going to add the fully connected layers onto the model.  The original VGG16 model has three linear layers with 4096 neurons in each of the first two and 10 in the final linear layer to match the number of categories we are trying to predict.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Add the fully-connected layers </span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">Flatten</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;flatten&#39;</span><span class="p">)(</span><span class="n">output_vgg16_conv</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">4096</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;fc1&#39;</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">4096</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;relu&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;fc2&#39;</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;softmax&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;predictions&#39;</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now, we will create the model with the output linear layers added.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Create your own model </span>
+<span class="n">my_model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="nb">input</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>/home/kevin/anaconda2/envs/Deeplearning/lib/python3.6/site-packages/ipykernel/__main__.py:2: UserWarning: Update your `Model` call to the Keras 2 API: `Model(inputs=Tensor(&#34;im..., outputs=Tensor(&#34;pr...)`
+  from ipykernel import kernelapp as app
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Finally, we will compile the model and run it. The number of total passes a through a dataset a model makes before reaching completion is called a epoch.  It is common for the machine learning model to look at every sample of a dataset during an epoch.  This can change though as in some machine learning models sets are left out for validating the results, a topic we will cover next.  So you may be asking yourself: Why don't you just choose a really high number of epochs and make a lot of passes over the data.  You will learn that GPU time is expensive, especially on large datasets and there is a point in which the model will not improve any further.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Next, we will choose our optimizer and set a learning rate.  An optimizer is the function that a model follows to improve its accuracy. In this model since we set the convolutional weights to not be trainable, the linear layers are the only layers that are trainable. Think of a linear layer as y = mx + b.  The slope (m) will be the value that is optimized to differentiate the 10 different classes.  It is optimized by stochastic gradient descent.  Gradient descent takes the derivative of the loss function which we specify as categorical crossentropy.  The derivate of the loss function lets us know which direction to adjust the slope in order to minimize the categorical cross entropy which better separates the 10 categories.  <br>
+This can be a bit confusing at first so lets try to simplify it:<br></p>
+<ol>
+<li>We want to correctly put as many of the images in the proper categories.  We measure this by calculating the categorical cross entropy of every mini batch run through the model (specified in batch_size)<br></li>
+<li>The model then takes the derivatives of all the linear layers with respect to the loss function.<br></li>
+<li>The model looks at the values for the losses of the linear layers and uses ADAM to change the slope (m) of the linear layer.  This creates values for the linear layers that better differentiate the categories.  </li>
+</ol>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The model is then compiled and fit.  The score lets us look at the metrics for the model after training is complete.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[19]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#In the summary, weights and layers from VGG part will be hidden, but they will be fit during the training</span>
+<span class="c1">#my_model.summary() &lt;&lt;run to see a summary of your model</span>
+
+<span class="n">epochs</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="n">Adam</span> <span class="o">=</span> <span class="n">Adam</span><span class="p">(</span><span class="n">lr</span><span class="o">=.</span><span class="mi">0001</span><span class="p">)</span>
+<span class="n">my_model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="n">Adam</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span><span class="s1">&#39;categorical_crossentropy&#39;</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">])</span>
+
+<span class="n">my_model</span><span class="o">.</span><span class="n">fit_generator</span><span class="p">(</span><span class="n">datagen</span><span class="o">.</span><span class="n">flow</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">256</span><span class="p">),</span> 
+                    <span class="n">steps_per_epoch</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">x_train</span><span class="p">),</span> <span class="n">epochs</span><span class="o">=</span><span class="n">epochs</span><span class="p">)</span>
+<span class="n">score</span> <span class="o">=</span> <span class="n">my_model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>
+<span class="n">my_model</span><span class="o">.</span><span class="n">metrics_names</span> <span class="p">,</span> <span class="n">score</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Epoch 1/3
+50000/50000 [==============================] - 1962s - loss: 1.0876 - acc: 0.9269  
+Epoch 2/3
+50000/50000 [==============================] - 1949s - loss: 0.0069 - acc: 0.9985  
+Epoch 3/3
+50000/50000 [==============================] - 1948s - loss: 3.2399e-04 - acc: 1.0000  
+10000/10000 [==============================] - 1s     
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+<div class="prompt output_prompt">Out[19]:</div>
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>([&#39;loss&#39;, &#39;acc&#39;], [3.7053978271484374, 0.64890000000000003])</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>64% accuracy.  Ouch... We see that our model is not nearly as good on our test set as our training set.  Why is that? Overfitting.  We will talk about that next.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+
+
+
+
+</div>
+ 
+
+
+ 
+
+
+
+
+<p>Next:</p><a class="btn btn-success" href="{% url 'Overfitting' %}" role="button">Reducing Overfitting</a>
+{% endblock %}

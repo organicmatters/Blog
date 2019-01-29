@@ -1,0 +1,63 @@
+{% extends "webapp/homeheader.html" %}
+ {% block content %}
+ {% load staticfiles %}
+
+    <br>
+    <div align="center">
+    <h1 id="title">Python for Machine Learning and Deep Learning</h1>
+    </div>
+    <br>
+     <div class="row">
+    <div class="col">
+     <div class="card" style="width: 20rem; height: 25rem;">
+      <img class="card-img-top" src="{% static "img/cloud_thumb.jpg" %}" alt="Cloud">
+      <div class="card-body">
+        <h2 class="card-title">Getting set up in the Cloud</h2>
+        <p class="card-text">Learn how get running on GPU's in the cloud</p>
+        <br>
+	<a href="{% url 'GettingAWSserverrunning' %}" class="btn btn-primary">Start</a>
+      </div>
+    </div>
+	<div class="card" style="width: 20rem; height: 25rem;">
+      <img class="card-img-top" src="{% static "img/whatssellingonamazon.png" %}" alt="Cloud">
+      <div class="card-body">
+        <h2 class="card-title">What is selling on Amazon?</h2>
+        <p class="card-text">An analysis of what electronics are selling on Amazon</p>
+	<a href="{% url 'GettingAWSserverrunning' %}" class="btn btn-primary">Start</a>
+      </div>
+    </div>
+    </div>
+    <div class="col">
+      <div class="card" style="width: 20rem; height: 25rem;">
+      <img class="card-img-top" src="{% static "img/eye_thumb.jpeg" %}" alt="Human Eye">
+      <div class="card-body">
+        <h2 class="card-title">Image Classification with Keras</h2>
+        <p class="card-text">Computer Vision: Learn to use pretrained models to separate custom images</p>
+        <a href="{% url 'JupyterSetup' %}" class="btn btn-primary">Start</a>
+      </div>
+    </div>
+    </div>
+ <div class="col">
+      <div class="card" style="width: 20rem; height: 25rem;">
+      <img class="card-img-top" src="{% static "img/blog_thumb.jpg" %}" alt="Blog">
+      <div class="card-body">
+        <h2 class="card-title">Data Science Blog</h2>
+        <p class="card-text">Discussion on a range of topics in the data science field
+	<br>
+	<br>
+	<br> 
+        <a href="{% url 'DataScienceWorkFlow' %}" class="btn btn-primary">Start</a>
+      </div>
+    </div>
+    </div>    
+  </div>
+
+
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+ {% endblock %}

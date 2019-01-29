@@ -1,0 +1,68 @@
+{% extends "webapp/awsheader.html" %}
+{% load staticfiles %}
+{% block content %}
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Getting-started-with-with-GPU's-AWS">Getting started with with GPU's AWS<a class="anchor-link" href="#Getting-started-with-with-GPU's-AWS"></a></h1>
+</div>
+</div>
+</div>
+<iframe width="853" height="480" src="https://www.youtube.com/embed/HWn2krPnQkE" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In order to get started training deep learning models you will need to have access to a GPU.  If you have a desktop this may not be an issue, however, if you are on a laptop you most likely do not have a GPU. Specifically the gpu needs to be an Nvidia GPU with CUDA installed.  At this time this is the only GPU compatitable for deep learning. <br><br>GPU's have come a long way in the last few years due to a rise of the computer gaming industry. GPU's specialize in parallel processing.  Parallel processing is important when you are playing Call of Duty and throw a grenade and it blows up and all the shrapnel physics needs to be calculated at once so the game know's where each piece of shrapnel is going to land.  In deep learning thousands of samples are thrown into a set of equations and the equations need to create constants that can differentiate the samples with their desired out comes.  More on that later.<br><br>
+If you need access to a GPU, the most common way to access the gpu is through the cloud.  Amazon Web Services is the most popular option and relatively inexpensive.  If you don't already, go ahead and get an AWS account set up. Once you are logged into AWS follow the instructions for setting up an AWS server below:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Launch EC2 instance:<br><br>
+<img src={% static "img/aws1.JPG" %} class="img-fluid" alt="Responsive image"><br><br>
+Select AWS Marketplace and type "Deeplearning AMI".  Here you have a choice.  If you are a beginner select the Deep Learning AMI (Ubuntu).  If you have experience downloading python packages and want to create a custom environment select Deep Learning Base AMI, which only has the lower level CUDA and cudnn installed:<br><br>
+Simple Option:
+<img src={% static "img/AMIselection.JPG" %} class="img-fluid" alt="Responsive image"><br><br> 
+More customizable option:
+<img src={% static "img/deeplearningbaseAMI.JPG" %} class="img-fluid" alt="Responsive image"><br><br>
+Select p2.xlarge:<br><br>
+<img src={% static "img/aws3.JPG" %} class="img-fluid" alt="Responsive image"><br><br>
+If you want you can modify the storage.<br> 
+Click Launch.  This will prompt to select an existing key pair or create a new key pair.<br>
+Select new key pair.<br>
+Create Key pair .pem file name:<br><br>
+<img src={% static "img/aws6.JPG" %} class="img-fluid" alt="Responsive image"><br><br>
+Click download key pair.<br>
+Key pair will be downloaded.  Move the key pair into a folder in which you will access the AWS server.<br>
+Launch instance.<br>
+Go to the EC2 instances page:<br><br>
+<img src={% static "img/aws11.JPG" %} class="img-fluid" alt="Responsive image"><br><br>
+Select the instance that you just created that is now running and click connect.  This will prompt directions to connect.<br>
+Pull up a terminal and go to the directory in which you saved the .pem file to.<br>
+Type chmod 400 [nameofyourpemfile].pem.  This will make the .pem file not publically viewable. <br>
+Go to the example in the window and copy and paste the ssh snippet into the terminal:<br></p>
+<img src={% static "img/aws12.JPG" %} class="img-fluid" alt="Responsive image">
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="inner_cell">
+    <div class="input_area">
+
+
+</div>
+</div>
+</div>
+
+</div>
+<br>
+<a class="btn btn-success" href="{% url 'GettingAWSserverrunning' %}" role="button">Back to Top</a>
+{% endblock %}
