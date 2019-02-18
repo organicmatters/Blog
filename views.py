@@ -41,3 +41,9 @@ def SubwayAnalysis(request):
 
 def EdgarCrawl(request):
     return render(request, 'webapp/EdgarCrawlBlog.html')
+
+def CleaningChicagoCrime(request):
+    return render(request, 'webapp/cleaningchicagocrime.html')
+
+def ModelingChicagoCrime(request):
+    return render(request, 'webapp/modelingchicagocrime.html')

@@ -51,13 +51,19 @@
       <img class="card-img-top" src="{% static "img/blog_thumb.jpg" %}" alt="Blog">
       <div class="card-body">
         <h2 class="card-title">Data Science Blog</h2>
-        <p class="card-text">Discussion on a range of topics in the data science field
-	<br>
-	<br>
-	<br> 
+        <p class="card-text">Discussion on a range of topics in the data science field</p>
         <a href="{% url 'EdgarCrawl' %}" class="btn btn-primary">Start</a>
       </div>
     </div>
+    <div class="card" style="width: 20rem; height: 25rem;">
+      <img class="card-img-top" src="{% static "img/chicagoskyline.jpg" %}" alt="Chicago">
+      <div class="card-body">
+        <h2 class="card-title">Crime in Chicago</h2>
+        <p class="card-text">Predicting arrests for crimes committed in Chicago</p>
+        <a href="{% url 'CleaningChicagoCrime' %}" class="btn btn-primary">Start</a>
+      </div>
+    </div>
+
     </div>    
   </div>
 

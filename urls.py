@@ -14,5 +14,7 @@ urlpatterns = [
     url(r'^LoadingJungleScoutData/', views.LoadingJungleScoutData, name='LoadingJungleScoutData'),
     url(r'^CleaningJungleScoutData/', views.CleaningJungleScoutData, name='CleaningJungleScoutData'),
     url(r'^SubwayAnalysis/', views.SubwayAnalysis, name='SubwayAnalysis'),
-    url(r'^EdgarCrawl/', views.EdgarCrawl, name='EdgarCrawl')
+    url(r'^EdgarCrawl/', views.EdgarCrawl, name='EdgarCrawl'),
+    url(r'^CleaningChicagoCrime/', views.CleaningChicagoCrime, name='CleaningChicagoCrime'),
+    url(r'^ModelingChicagoCrime/', views.ModelingChicagoCrime, name='ModelingChicagoCrime')
 ]
